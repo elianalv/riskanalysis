@@ -1,17 +1,29 @@
 <?php
 /**
- * Front to the WordPress application. This file doesn't do anything, but loads
- * wp-blog-header.php which does and tells WordPress to load the theme.
+ * Used to set up all core blocks used with the block editor.
  *
  * @package WordPress
  */
 
-/**
- * Tells WordPress to load the WordPress theme and output it.
- *
- * @var bool
- */
-define( 'WP_USE_THEMES', true );
+define( 'BLOCKS_PATH', ABSPATH . WPINC . '/blocks/' );
 
-/** Loads the WordPress Environment and Template */
-require __DIR__ . '/wp-blog-header.php';
+// Include files required for core blocks registration.
+require BLOCKS_PATH . 'legacy-widget.php';
+require BLOCKS_PATH . 'widget-group.php';
+require BLOCKS_PATH . 'require-dynamic-blocks.php';
+
+/**
+ * Registers core block types using metadata files.
+ * Dynamic core blocks are registered separately.
+ *
+ * @since 5.5.0
+ */
+function register_core_block_types_from_metadata() {
+	$block_folders = require BLOCKS_PATH . 'require-static-blocks.php';
+	foreach ( $block_folders as $block_folder ) {
+		register_block_type(
+			BLOCKS_PATH . $block_folder
+		);
+	}
+}
+add_action( 'init', 'register_core_block_types_from_metadata' );
